@@ -1,6 +1,6 @@
 # BMC & Firmware 學習指南 — Axiado PIT Intern 準備
 
-> 從零到面試：你需要知道的一切
+> 從零到面試：需要知道的一切
 
 ---
 
@@ -273,11 +273,11 @@ double temp = (raw >> 4) * 0.0625;
 
 ---
 
-## 🔧 Part 7: 你的優勢 — 如何在面試中展現
+## 🔧 Part 7: 優勢 — 如何在面試中展現
 
-### 你的獨特優勢
+### 獨特優勢
 
-| 你的經驗 | 對應到 PIT 工作 |
+| 經驗 | 對應到 PIT 工作 |
 |---------|---------------|
 | TSN PID 控制 (7 stages) | BMC 熱管理 PID 控制 |
 | MOXA TSN switch 操作 | 硬體設備調試經驗 |
@@ -289,28 +289,25 @@ double temp = (raw >> 4) * 0.0625;
 ### 面試 Q&A 準備
 
 **Q: 為什麼想做 BMC/firmware?**
-> 我碩士做 TSN closed-loop PID 控制，核心就是即時系統管理，
-> 這跟 BMC 管理伺服器的理念完全一致。我在 TSMC 實習也做了
-> 溫度預測模型，這些經驗讓我對平台管理和熱控制有深入理解。
+> PID 控制，核心就是即時系統管理，
+> 這跟 BMC 管理伺服器的理念完全一致。
 
-**Q: 你了解 Axiado 的 TCU 嗎?**
+**Q: 了解 Axiado 的 TCU 嗎?**
 > TCU 是 hardware-anchored Root of Trust，整合安全、管理、
 > 控制在單一 SoC。它用 AI 做 runtime firmware attestation，
 > 比傳統只在 boot time 驗證更安全。我在 mini-BMC 專案中
 > 實作了簡化版的 secure boot chain 來理解這個概念。
 
-**Q: 解釋你的 PID 控制經驗**
-> 我在 TSN 研究中實作了 7 個 stage 的 PID 演算法，
-> 從基礎 PID 到 adaptive gain 到 bidirectional control。
-> 同樣的數學直接可以應用到 BMC 的風扇控制：
+**Q: 解釋 PID 控制經驗**
+> PID 同樣的數學直接可以應用到 BMC 的風扇控制：
 > 把 process variable 從「網路延遲」換成「CPU 溫度」，
 > control variable 從「GCL time slot」換成「fan duty」。
-> 我還做了完整的統計分析 (MAE, RMSE, Cpk, S/N ratio)。
+> 還做了完整的統計分析 (MAE, RMSE, Cpk, S/N ratio)。
 
-**Q: 你用什麼 debug 工具?**
+**Q: 用什麼 debug 工具?**
 > 軟體: GDB, Valgrind, strace, printf debugging
 > 硬體: 理解 I2C/SPI protocol analyzer, logic analyzer 的概念
-> 網路: Wireshark (在 TSN 研究中大量使用)
+> 網路: Wireshark
 
 ---
 
@@ -330,7 +327,7 @@ double temp = (raw >> 4) * 0.0625;
 - 在 QEMU 跑 OpenBMC (模擬 BMC 環境)
 - 用 `ipmitool` 連接任何有 BMC 的伺服器
 
-### 每日學習計畫
+### 學習計畫
 
 | 天 | 主題 | 時間 |
 |---|------|-----|
@@ -341,7 +338,3 @@ double temp = (raw >> 4) * 0.0625;
 | 5 | 讀 Axiado TCU whitepaper + 安全標準 | 2h |
 | 6 | Linux I2C/SPI 實驗 (RPi 或文檔) | 3h |
 | 7 | 模擬面試 Q&A | 2h |
-
----
-
-祝你面試順利！你的 TSN PID 經驗是獨特優勢，好好利用它。🚀
