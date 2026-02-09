@@ -4,7 +4,7 @@
 
 ---
 
-## 📌 學習路徑總覽
+## 學習路徑總覽
 
 ```
 Week 1: BMC 基礎 + C 語言韌體開發
@@ -15,7 +15,7 @@ Week 4: 動手做 + 準備面試問答
 
 ---
 
-## 🔧 Part 1: BMC 是什麼？
+## Part 1: BMC 是什麼？
 
 ### 核心概念
 
@@ -74,7 +74,7 @@ BMC (Baseboard Management Controller) 是伺服器主機板上的獨立微控制
 
 ---
 
-## 🔧 Part 2: IPMI 協議
+## Part 2: IPMI 協議
 
 ### IPMI 命令結構
 
@@ -108,7 +108,7 @@ ipmitool raw 0x06 0x01     # 原始 IPMI: Get Device ID
 
 ---
 
-## 🔧 Part 3: Redfish API
+## Part 3: Redfish API
 
 ### 為什麼要學 Redfish？
 
@@ -142,7 +142,7 @@ IPMI 是 1990 年代的 binary 協議，Redfish 是取代它的現代標準：
 
 ---
 
-## 🔧 Part 4: OpenBMC 架構
+## Part 4: OpenBMC 架構
 
 ### 核心元件
 
@@ -189,7 +189,7 @@ git clone https://github.com/openbmc/openbmc.git
 
 ---
 
-## 🔧 Part 5: 安全 — Root of Trust (Axiado 核心業務)
+## Part 5: 安全 — Root of Trust (Axiado 核心業務)
 
 ### Secure Boot Chain
 
@@ -231,7 +231,7 @@ git clone https://github.com/openbmc/openbmc.git
 
 ---
 
-## 🔧 Part 6: Linux Embedded & 硬體介面
+## Part 6: Linux Embedded & 硬體介面
 
 ### BMC 常用介面
 
@@ -273,18 +273,18 @@ double temp = (raw >> 4) * 0.0625;
 
 ---
 
-## 🔧 Part 7: 優勢 — 如何在面試中展現
+## Part 7: 優勢 — 如何在面試中展現
 
 ### 獨特優勢
 
 | 經驗 | 對應到 PIT 工作 |
 |---------|---------------|
-| TSN PID 控制 (7 stages) | BMC 熱管理 PID 控制 |
+| PID 控制  | BMC 熱管理 PID 控制 |
 | MOXA TSN switch 操作 | 硬體設備調試經驗 |
 | Python GUI + 控制軟體 | BMC management tool 開發 |
 | C 語言 (SnakeWithChatroom) | BMC firmware 開發 |
 | 統計分析 (MAE, RMSE, Cpk) | 品質驗證、性能分析 |
-| TSMC 實習 (thermal model) | 溫度建模、散熱理解 |
+| TSMC 實習 | 溫度建模、散熱理解 |
 
 ### 面試 Q&A 準備
 
@@ -311,7 +311,7 @@ double temp = (raw >> 4) * 0.0625;
 
 ---
 
-## 📚 推薦學習資源
+## 推薦學習資源
 
 ### 書籍
 - "Linux Device Drivers, 3rd Ed" (free online) - Chapter 10 (I2C)
