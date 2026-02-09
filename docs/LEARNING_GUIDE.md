@@ -25,7 +25,7 @@ BMC (Baseboard Management Controller) 是伺服器主機板上的獨立微控制
 1. **遠端管理** — IT 人員可以遠端開關機、看 console、裝 OS
 2. **硬體監控** — 讀取溫度/電壓/風扇 sensor
 3. **事件記錄** — 記錄硬體錯誤 (SEL - System Event Log)
-4. **熱管理** — PID 控制風扇轉速（你最擅長的！）
+4. **熱管理** — PID 控制風扇轉速
 5. **安全** — Secure Boot、firmware attestation
 
 ### BMC 硬體組成
