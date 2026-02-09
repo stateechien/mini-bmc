@@ -10,8 +10,6 @@
 ./scripts/demo.sh
 ```
 
-就這樣！demo.sh 會自動帶你走過 6 個步驟。
-
 ---
 
 ## 環境需求
@@ -19,7 +17,7 @@
 ### 作業系統
 - **Ubuntu 20.04+** (推薦) 或任何 Debian-based Linux
 - macOS (需要 Homebrew)
-- WSL2 on Windows (推薦 Windows 用戶使用)
+- WSL2 on Windows
 
 ### 軟體依賴
 
@@ -65,7 +63,7 @@ pip3 install fastapi uvicorn requests
 
 ## Demo 展示流程 (手動版)
 
-如果你想手動一步步展示而不用 demo.sh：
+如果想手動一步步展示而不用 demo.sh：
 
 ### Step 1: Build
 ```bash
@@ -134,7 +132,7 @@ xdg-open http://localhost:8000/dashboard # Linux
 
 ---
 
-## 面試展示建議
+## 面試
 
 ### 時間分配 (10 分鐘 demo)
 | 時間 | 內容 | 說什麼 |
