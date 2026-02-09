@@ -3,7 +3,7 @@
  *
  * 【學習重點 - 從 TSN 到 BMC 的控制理論遷移】
  *
- * 你在 TSN 論文中做的 PID：
+ * 論文中做的 PID：
  *   error = target_delay - measured_delay
  *   output = 調整 GCL time slot
  *
@@ -14,12 +14,8 @@
  * Anti-windup 很重要：
  *   如果 fan 已經 100% 但溫度還是高，integral 會一直累積
  *   → 溫度降下來後 fan 遲遲不降速 (windup 問題)
- *   解法：clamp integral term，跟你 Stage 6/7 做的一樣
+ *   解法：clamp integral term，跟論文試過的實驗 Stage 6/7 做的一樣
  *
- * 你面試可以說的話：
- *   "PID thermal control 的數學跟我碩論的 TSN GCL scheduling
- *    完全一樣，我已經實作過 7 個 stage 的不同 PID 演算法，
- *    包含 anti-windup、adaptive gain、bidirectional control。"
  */
 
 #include <stdio.h>
