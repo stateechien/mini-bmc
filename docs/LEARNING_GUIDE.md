@@ -70,7 +70,7 @@ BMC (Baseboard Management Controller) 是伺服器主機板上的獨立微控制
 - [IPMI 2.0 Specification (Intel)](https://www.intel.com/content/www/us/en/products/docs/servers/ipmi/ipmi-second-gen-interface-spec-v2-rev1-1.html)
 - [DMTF Redfish API](https://www.dmtf.org/standards/redfish)
 - [OpenBMC GitHub](https://github.com/openbmc/openbmc)
-- [Axiado TCU Whitepaper](https://axiado.com/) — 了解你要加入的公司
+- [Axiado TCU Whitepaper](https://axiado.com/)
 
 ---
 
