@@ -1,0 +1,25 @@
+# Build artifacts
+firmware/build/
+tests/test_pid
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Temp files
+/tmp/
+*.tmp
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db

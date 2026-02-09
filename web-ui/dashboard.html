@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini BMC Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #0f1117;
+            color: #e4e4e7;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1a1d29, #252836);
+            padding: 16px 24px;
+            border-bottom: 1px solid #2d3044;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #f4f4f5;
+        }
+        .header h1 span { color: #60a5fa; }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-ok { background: #052e16; color: #4ade80; }
+        .status-warn { background: #422006; color: #fbbf24; }
+        .status-crit { background: #450a0a; color: #f87171; }
+        .dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        .dot-ok { background: #4ade80; }
+        .dot-warn { background: #fbbf24; }
+        .dot-crit { background: #f87171; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Grid layout */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 16px;
+            padding: 16px;
+        }
+
+        /* Card */
+        .card {
+            background: #1a1d29;
+            border: 1px solid #2d3044;
+            border-radius: 8px;
+            padding: 16px;
+        }
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #a1a1aa;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        /* Sensor rows */
+        .sensor-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #2d3044;
+        }
+        .sensor-row:last-child { border-bottom: none; }
+        .sensor-name { font-size: 13px; color: #a1a1aa; }
+        .sensor-value {
+            font-size: 16px;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+        .val-ok { color: #4ade80; }
+        .val-warn { color: #fbbf24; }
+        .val-crit { color: #f87171; }
+
+        /* PID info */
+        .pid-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        .pid-item {
+            text-align: center;
+            padding: 8px;
+            background: #252836;
+            border-radius: 6px;
+        }
+        .pid-label { font-size: 11px; color: #71717a; }
+        .pid-value { font-size: 18px; font-weight: 700; color: #60a5fa; }
+
+        /* Chart */
+        .chart-container {
+            position: relative;
+            height: 200px;
+            margin-top: 8px;
+        }
+
+        /* Event log */
+        .log-list {
+            max-height: 240px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #3f3f46 #1a1d29;
+        }
+        .log-entry {
+            padding: 6px 8px;
+            border-left: 3px solid #3f3f46;
+            margin-bottom: 4px;
+            font-size: 12px;
+            background: #252836;
+            border-radius: 0 4px 4px 0;
+        }
+        .log-info { border-left-color: #60a5fa; }
+        .log-warning { border-left-color: #fbbf24; }
+        .log-critical { border-left-color: #f87171; }
+        .log-time { color: #71717a; font-size: 11px; }
+        .log-msg { color: #d4d4d8; margin-top: 2px; }
+
+        /* Secure boot */
+        .boot-chain {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .boot-stage {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .boot-pass { background: #052e16; color: #4ade80; border: 1px solid #166534; }
+        .boot-fail { background: #450a0a; color: #f87171; border: 1px solid #991b1b; }
+        .boot-pending { background: #1c1917; color: #a1a1aa; border: 1px solid #3f3f46; }
+        .boot-arrow { color: #3f3f46; font-size: 16px; }
+
+        /* Full width card */
+        .full-width { grid-column: 1 / -1; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><span>Mini BMC</span> Dashboard</h1>
+        <div id="health-badge" class="status-badge status-ok">
+            <div class="dot dot-ok"></div>
+            System OK
+        </div>
+    </div>
+
+    <div class="grid">
+        <!-- Temperature Sensors -->
+        <div class="card">
+            <div class="card-title">🌡️ Temperatures</div>
+            <div id="temp-sensors"></div>
+        </div>
+
+        <!-- Voltage Sensors -->
+        <div class="card">
+            <div class="card-title">⚡ Voltages</div>
+            <div id="volt-sensors"></div>
+        </div>
+
+        <!-- Fan & PID Control -->
+        <div class="card">
+            <div class="card-title">🌀 Thermal Control (PID)</div>
+            <div id="fan-sensors"></div>
+            <div style="margin-top: 12px;">
+                <div class="pid-grid" id="pid-info"></div>
+            </div>
+        </div>
+
+        <!-- Secure Boot Chain -->
+        <div class="card">
+            <div class="card-title">🔒 Secure Boot Chain</div>
+            <div class="boot-chain" id="boot-chain"></div>
+        </div>
+
+        <!-- Temperature Trend Chart -->
+        <div class="card full-width">
+            <div class="card-title">📈 Temperature Trend (CPU)</div>
+            <div class="chart-container">
+                <canvas id="tempChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Event Log -->
+        <div class="card full-width">
+            <div class="card-title">📋 System Event Log (Recent)</div>
+            <div class="log-list" id="event-log"></div>
+        </div>
+    </div>
+
+    <script>
+        // ── Chart Setup ──
+        const MAX_POINTS = 60;
+        const tempData = { labels: [], cpu: [], inlet: [], setpoint: [], fanDuty: [] };
+
+        const ctx = document.getElementById('tempChart').getContext('2d');
+        const tempChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: tempData.labels,
+                datasets: [
+                    {
+                        label: 'CPU Temp (°C)',
+                        data: tempData.cpu,
+                        borderColor: '#f87171',
+                        backgroundColor: 'rgba(248,113,113,0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 0,
+                    },
+                    {
+                        label: 'Inlet Temp (°C)',
+                        data: tempData.inlet,
+                        borderColor: '#60a5fa',
+                        tension: 0.3,
+                        pointRadius: 0,
+                    },
+                    {
+                        label: 'Setpoint (°C)',
+                        data: tempData.setpoint,
+                        borderColor: '#fbbf24',
+                        borderDash: [5, 5],
+                        tension: 0,
+                        pointRadius: 0,
+                    },
+                    {
+                        label: 'Fan Duty (%)',
+                        data: tempData.fanDuty,
+                        borderColor: '#4ade80',
+                        tension: 0.3,
+                        pointRadius: 0,
+                        yAxisID: 'y1',
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: { duration: 300 },
+                plugins: {
+                    legend: {
+                        labels: { color: '#a1a1aa', font: { size: 11 } },
+                    },
+                },
+                scales: {
+                    x: {
+                        ticks: { color: '#52525b', maxTicksLimit: 10 },
+                        grid: { color: '#27272a' },
+                    },
+                    y: {
+                        title: { display: true, text: '°C', color: '#71717a' },
+                        ticks: { color: '#71717a' },
+                        grid: { color: '#27272a' },
+                        min: 0, max: 100,
+                    },
+                    y1: {
+                        position: 'right',
+                        title: { display: true, text: 'Duty %', color: '#71717a' },
+                        ticks: { color: '#71717a' },
+                        grid: { display: false },
+                        min: 0, max: 100,
+                    },
+                },
+            },
+        });
+
+        // ── Helper Functions ──
+
+        function valClass(status) {
+            if (status === 'Critical') return 'val-crit';
+            if (status === 'Warning') return 'val-warn';
+            return 'val-ok';
+        }
+
+        function sensorUnit(type) {
+            return { Temperature: '°C', Voltage: 'V', Fan: ' RPM', Power: 'W' }[type] || '';
+        }
+
+        function renderSensors(containerId, sensors) {
+            const el = document.getElementById(containerId);
+            el.innerHTML = sensors.map(s => `
+                <div class="sensor-row">
+                    <span class="sensor-name">${s.name}</span>
+                    <span class="sensor-value ${valClass(s.status)}">
+                        ${s.value.toFixed(s.type === 'Fan' ? 0 : 2)}${sensorUnit(s.type)}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        function renderPID(pid, fanDuty) {
+            document.getElementById('pid-info').innerHTML = `
+                <div class="pid-item">
+                    <div class="pid-label">Fan Duty</div>
+                    <div class="pid-value">${fanDuty.toFixed(1)}%</div>
+                </div>
+                <div class="pid-item">
+                    <div class="pid-label">Setpoint</div>
+                    <div class="pid-value">${(pid.setpoint || 0).toFixed(1)}°</div>
+                </div>
+                <div class="pid-item">
+                    <div class="pid-label">PID Output</div>
+                    <div class="pid-value">${(pid.output || 0).toFixed(1)}%</div>
+                </div>
+                <div class="pid-item">
+                    <div class="pid-label">Kp</div>
+                    <div class="pid-value">${pid.kp || 0}</div>
+                </div>
+                <div class="pid-item">
+                    <div class="pid-label">Ki</div>
+                    <div class="pid-value">${pid.ki || 0}</div>
+                </div>
+                <div class="pid-item">
+                    <div class="pid-label">Kd</div>
+                    <div class="pid-value">${pid.kd || 0}</div>
+                </div>
+            `;
+        }
+
+        function renderBootChain(secBoot) {
+            const el = document.getElementById('boot-chain');
+            const images = secBoot.images || [];
+            el.innerHTML = images.map((img, i) => {
+                let cls = 'boot-pending';
+                let icon = '⏳';
+                if (img.verified) {
+                    cls = img.passed ? 'boot-pass' : 'boot-fail';
+                    icon = img.passed ? '✓' : '✗';
+                }
+                return (i > 0 ? '<span class="boot-arrow">→</span>' : '') +
+                    `<span class="boot-stage ${cls}">${icon} ${img.name}</span>`;
+            }).join('');
+
+            const overall = secBoot.overall_passed;
+            el.innerHTML += `
+                <span class="boot-arrow">→</span>
+                <span class="boot-stage ${overall ? 'boot-pass' : 'boot-fail'}">
+                    ${overall ? '🔒 SECURE' : '⚠️ COMPROMISED'}
+                </span>
+            `;
+        }
+
+        function renderEventLog(sel) {
+            const el = document.getElementById('event-log');
+            const entries = (sel.entries || []).slice(-20).reverse();
+            el.innerHTML = entries.map(e => {
+                const sev = (e.severity || 'Info').toLowerCase();
+                const dt = new Date(e.timestamp * 1000).toLocaleTimeString();
+                return `
+                    <div class="log-entry log-${sev}">
+                        <span class="log-time">${dt} [${e.source}]</span>
+                        <div class="log-msg">${e.message}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateHealthBadge(sensors) {
+            const badge = document.getElementById('health-badge');
+            let health = 'ok';
+            for (const s of sensors) {
+                if (s.status === 'Critical') { health = 'crit'; break; }
+                if (s.status === 'Warning') health = 'warn';
+            }
+            const labels = { ok: 'System OK', warn: 'Warning', crit: 'Critical' };
+            badge.className = `status-badge status-${health}`;
+            badge.innerHTML = `<div class="dot dot-${health}"></div>${labels[health]}`;
+        }
+
+        // ── Data Fetch Loop ──
+
+        async function fetchAndUpdate() {
+            try {
+                const resp = await fetch('/api/state');
+                const data = await resp.json();
+
+                const sensors = data.sensors || [];
+                const temps = sensors.filter(s => s.type === 'Temperature');
+                const volts = sensors.filter(s => s.type === 'Voltage');
+                const fans = sensors.filter(s => s.type === 'Fan');
+                const thermal = data.thermal || {};
+                const pid = thermal.pid || {};
+
+                renderSensors('temp-sensors', temps);
+                renderSensors('volt-sensors', volts);
+                renderSensors('fan-sensors', fans);
+                renderPID(pid, thermal.fan_duty_percent || 0);
+                renderBootChain(data.secure_boot || {});
+                renderEventLog(data.sel || {});
+                updateHealthBadge(sensors);
+
+                // Update chart
+                const now = new Date().toLocaleTimeString();
+                const cpuTemp = temps.find(s => s.name === 'CPU_Temp');
+                const inletTemp = temps.find(s => s.name === 'Inlet_Temp');
+
+                tempData.labels.push(now);
+                tempData.cpu.push(cpuTemp ? cpuTemp.value : 0);
+                tempData.inlet.push(inletTemp ? inletTemp.value : 0);
+                tempData.setpoint.push(pid.setpoint || 65);
+                tempData.fanDuty.push(thermal.fan_duty_percent || 0);
+
+                if (tempData.labels.length > MAX_POINTS) {
+                    tempData.labels.shift();
+                    tempData.cpu.shift();
+                    tempData.inlet.shift();
+                    tempData.setpoint.shift();
+                    tempData.fanDuty.shift();
+                }
+
+                tempChart.update();
+            } catch (err) {
+                console.error('Fetch error:', err);
+            }
+        }
+
+        // Poll every 2 seconds
+        fetchAndUpdate();
+        setInterval(fetchAndUpdate, 2000);
+    </script>
+</body>
+</html>
