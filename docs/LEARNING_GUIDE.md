@@ -1,4 +1,4 @@
-# BMC & Firmware 學習指南 — Axiado PIT Intern 準備
+# BMC & Firmware 學習指南 — Axiado PIT
 
 > 從零到面試：需要知道的一切
 
