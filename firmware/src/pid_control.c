@@ -1,8 +1,6 @@
 /**
  * pid_control.c - PID Closed-Loop Thermal Controller
  *
- * 【學習重點 - 從 TSN 到 BMC 的控制理論遷移】
- *
  * 論文中做的 PID：
  *   error = target_delay - measured_delay
  *   output = 調整 GCL time slot
